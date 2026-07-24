@@ -344,11 +344,48 @@ export default function LoginPage() {
 
         /* RESPONSIVE LAYOUT */
         @media (max-width: 900px) {
+          .login-container {
+            flex-direction: column;
+            min-height: 100vh;
+            height: auto;
+          }
           .login-left {
+            flex: none;
+            padding: 28px 24px;
+          }
+          .login-left > div:first-child > div[style] {
+            margin-top: 28px !important;
+          }
+          .hero-desc,
+          .feature-list {
             display: none;
           }
+          .hero-title {
+            font-size: 16px;
+            margin-bottom: 0;
+          }
+          .brand-name {
+            font-size: 26px;
+          }
+          .brand-logo-badge {
+            width: 56px;
+            height: 56px;
+          }
+          .system-status {
+            margin-top: 16px;
+          }
           .login-right {
-            flex: 1;
+            flex: none;
+            padding: 32px 20px 40px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .brand-name {
+            font-size: 21px;
+          }
+          .hero-title {
+            font-size: 14px;
           }
         }
       `}</style>
