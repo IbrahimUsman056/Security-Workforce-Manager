@@ -386,3 +386,35 @@ a { color: var(--color-primary-light); }
   border-radius: var(--radius); cursor: pointer; font-size: 13px; font-weight: 600;
 }
 .confirm-danger:hover { background: #b91c1c; }
+
+/* ===== Mobile header adjustments ===== */
+@media (max-width: 640px) {
+  .top-header {
+    padding: 0 12px;
+    gap: 8px;
+  }
+  .app-title {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+  }
+  .top-header-user span:first-child {
+    display: none; /* hide the user's name on very small screens, keep just the role badge */
+  }
+  .notif-dropdown {
+    width: 260px;
+    right: -10px;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-title {
+    max-width: 100px;
+    font-size: 12.5px;
+  }
+  .logout-btn span {
+    display: none; /* icon-only logout button on very small screens */
+  }
+}

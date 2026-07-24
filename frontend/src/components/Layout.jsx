@@ -45,7 +45,7 @@ export default function Layout() {
                 size={13}
                 style={{ verticalAlign: 'middle', marginRight: 5, color: 'red' }}
               />
-              Logout
+              <span>Logout</span>
             </button>
           </div>
         </header>

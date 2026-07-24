@@ -348,13 +348,56 @@ export default function JoinOrgPage() {
           to { transform: rotate(360deg); }
         }
 
+        .hero-block {
+          margin-top: 56px;
+        }
+        @media (max-width: 900px) {
+          .hero-block {
+            margin-top: 20px;
+          }
+        }
+
         /* RESPONSIVE LAYOUT */
         @media (max-width: 900px) {
+          .join-container {
+            flex-direction: column;
+            min-height: 100vh;
+            height: auto;
+          }
           .join-left {
+            flex: none;
+            padding: 28px 24px;
+          }
+          .hero-desc,
+          .feature-list {
             display: none;
           }
+          .hero-title {
+            font-size: 16px;
+            margin-bottom: 0;
+          }
+          .brand-name {
+            font-size: 26px;
+          }
+          .brand-logo-badge {
+            width: 56px;
+            height: 56px;
+          }
+          .system-status {
+            margin-top: 16px;
+          }
           .join-right {
-            flex: 1;
+            flex: none;
+            padding: 32px 20px 40px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .brand-name {
+            font-size: 21px;
+          }
+          .hero-title {
+            font-size: 14px;
           }
         }
       `}</style>
@@ -369,7 +412,7 @@ export default function JoinOrgPage() {
             <span className="brand-name pulsating-title">Security Workforce Manager</span>
           </div>
 
-          <div style={{ marginTop: '56px' }}>
+          <div className="hero-block">
             <p className="hero-title">
               Connect with your company workspace to view schedules and submit reports.
             </p>

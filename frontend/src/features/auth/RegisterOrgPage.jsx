@@ -357,13 +357,47 @@ export default function RegisterOrgPage() {
           to { transform: rotate(360deg); }
         }
 
+        .hero-block {
+          margin-top: 56px;
+        }
+        @media (max-width: 900px) {
+          .hero-block {
+            margin-top: 20px;
+          }
+        }
+
         /* RESPONSIVE LAYOUT */
         @media (max-width: 900px) {
+          .register-container {
+            flex-direction: column;
+            min-height: 100vh;
+            height: auto;
+          }
           .register-left {
+            flex: none;
+            padding: 28px 24px;
+          }
+          .hero-desc,
+          .feature-list {
             display: none;
           }
+          .hero-title {
+            font-size: 16px;
+            margin-bottom: 0;
+          }
+          .brand-name {
+            font-size: 26px;
+          }
+          .brand-logo-badge {
+            width: 56px;
+            height: 56px;
+          }
+          .system-status {
+            margin-top: 16px;
+          }
           .register-right {
-            flex: 1;
+            flex: none;
+            padding: 32px 20px 40px;
           }
           .form-grid {
             grid-template-columns: 1fr;
@@ -372,6 +406,15 @@ export default function RegisterOrgPage() {
             grid-column: span 1;
           }
         }
+
+        @media (max-width: 480px) {
+          .brand-name {
+            font-size: 21px;
+          }
+          .hero-title {
+            font-size: 14px;
+          }
+        }}
       `}</style>
 
       {/* LEFT SIDE: Branding & Organization Onboarding Pitch */}
@@ -384,7 +427,7 @@ export default function RegisterOrgPage() {
             <span className="brand-name pulsating-title">Security Workforce Manager</span>
           </div>
 
-          <div style={{ marginTop: '56px' }}>
+          <div className="hero-block">
             <p className="hero-title">
               Setup a dedicated workspace for your agency or company in under two minutes.
             </p>
