@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
-from fastapi.staticfiles import StaticFiles
-import os
 from app.database import create_db_and_tables
 from app.core.exceptions import validation_exception_handler
 from app.routers import (
@@ -12,9 +10,6 @@ from app.routers import (
 )
 
 app = FastAPI(title="Security Workforce Manager API")
-
-os.makedirs("uploads", exist_ok=True)
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.add_middleware(
     CORSMiddleware,

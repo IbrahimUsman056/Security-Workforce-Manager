@@ -1,19 +1,28 @@
-import os
-import uuid
+import cloudinary
+import cloudinary.uploader
 from fastapi import UploadFile
+from app.config import settings
+
+cloudinary.config(
+    cloud_name=settings.cloudinary_cloud_name,
+    api_key=settings.cloudinary_api_key,
+    api_secret=settings.cloudinary_api_secret,
+    secure=True,
+)
+
 
 def save_upload(file: UploadFile, subfolder: str) -> str:
-    upload_dir = f"uploads/{subfolder}"
-    os.makedirs(upload_dir, exist_ok=True)
-    ext = os.path.splitext(file.filename)[1]
-    filename = f"{uuid.uuid4().hex}{ext}"
-    filepath = os.path.join(upload_dir, filename)
-
-    with open(filepath, "wb") as f:
-        content = file.file.read()
-        f.write(content)
-
-    return filepath
+    """
+    Uploads a file to Cloudinary under a given subfolder and returns the
+    public HTTPS URL. Replaces local disk storage, which does not survive
+    Render's ephemeral filesystem across restarts/redeploys.
+    """
+    result = cloudinary.uploader.upload(
+        file.file,
+        folder=f"shiftguard/{subfolder}",
+        resource_type="auto",  # handles images and PDFs/documents correctly
+    )
+    return result["secure_url"]
 
 
 def save_incident_photo(file: UploadFile) -> str:

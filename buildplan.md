@@ -384,9 +384,6 @@ This extends your existing 7-phase MVP into a genuinely large-scale system. Same
 | Concern | Choice | Why |
 |---|---|---|
 | Multi-tenancy | Shared DB, `organization_id` column on every table (not separate DBs per client) | Much simpler to build/maintain, still a legitimate enterprise pattern (this is literally how Slack, Notion, etc. work under the hood) |
-| Background jobs | Replace APScheduler with **Celery + Redis** | APScheduler runs in-process and dies with your server; Celery gives you a real distributed task queue, retries, and scheduled tasks — this is what real companies use |
-| Real-time updates | **WebSockets** (FastAPI native support) for notifications | Replaces polling, teaches you a genuinely different communication pattern |
-| Mobile access | **PWA** (installable, offline-capable, push notifications) rather than a separate React Native app | One codebase, still installs on phones like an app, supports camera/geolocation/push — the right scope for this project instead of doubling your frontend work |
 | Face verification | Client-side lightweight ML (`face-api.js`) or a cloud API (AWS Rekognition / Azure Face) — **your call per phase** | Avoids running heavy ML infra yourself |
 | Containerization | **Docker Compose** — backend, frontend, MySQL, Redis, Celery worker all containerized | Genuinely valuable DevOps skill, makes local dev and deployment identical |
 | Audit logging | Middleware-based, writes to its own table | Cheap to add, very real-world relevant for compliance-adjacent software |
@@ -581,63 +578,20 @@ This is a separate router (`routers/client_portal.py`) rather than reusing admin
 
 ---
 
-## Phase 17 — Architecture Upgrades
-
-**Docker Compose** (`docker-compose.yml` at project root):
-```yaml
-services:
-  backend:
-    build: ./backend
-    ports: ["8000:8000"]
-    depends_on: [mysql, redis]
-  frontend:
-    build: ./frontend
-    ports: ["5173:5173"]
-  celery_worker:
-    build: ./backend
-    command: celery -A app.celery_app worker --loglevel=info
-    depends_on: [redis, mysql]
-  celery_beat:
-    build: ./backend
-    command: celery -A app.celery_app beat --loglevel=info
-    depends_on: [redis]
-  mysql:
-    image: mysql:8
-    environment:
-      MYSQL_DATABASE: shiftguard
-    ports: ["3306:3306"]
-  redis:
-    image: redis:7
-    ports: ["6379:6379"]
-```
-
-**Celery setup** (`backend/app/celery_app.py`) replaces `jobs/scheduler.py` — same job logic, moved into proper Celery tasks with `celery beat` handling the schedule instead of APScheduler.
-
-**WebSockets** (`routers/ws_notifications.py`) — FastAPI's native `WebSocket` support, push new notifications instantly instead of the 30-second polling interval you have now.
-
-**PWA conversion** (frontend):
-- `vite-plugin-pwa` — adds a service worker, web manifest, offline caching
-- Push notifications via the Web Push API (works on Android Chrome; iOS Safari support is more limited but improving)
-- "Add to Home Screen" prompt — genuinely installs like an app
-
----
 
 ## Suggested build order
 
 Given dependencies between phases, build in this order:
 
 1. **Phase 8 (Multi-tenancy)** — foundational, touches everything else
-2. **Phase 17 partial (Docker + Celery + Redis)** — do this early so every later phase's background jobs go straight into Celery instead of you writing APScheduler code you'll throw away
-3. **Phase 9 (Audit log)** — quick win, no dependencies
-4. **Phase 10 (Smart scheduling)**
-5. **Phase 12 (Incident severity/SLA)**
-6. **Phase 11 (Attendance verification)**
-7. **Phase 13 (Payroll/billing)**
-8. **Phase 14 (Documents)**
-9. **Phase 15 (Client portal)**
-10. **Phase 16 (Dashboards)**
-11. **Phase 17 remainder (WebSockets + PWA)**
-
+2. **Phase 9 (Audit log)** — quick win, no dependencies
+3. **Phase 10 (Smart scheduling)**
+4. **Phase 12 (Incident severity/SLA)**
+5. **Phase 11 (Attendance verification)**
+6. **Phase 13 (Payroll/billing)**
+7. **Phase 14 (Documents)**
+8. **Phase 15 (Client portal)**
+9. **Phase 16 (Dashboards)**
 ---
 
 This is a genuinely large scope — realistically 2-3 months of solid part-time work, not a weekend project, which is exactly what "heavy project" should look like on a resume.

@@ -75,7 +75,8 @@ export default function MyShiftsPage() {
       if (profile?.profile_photo_url) {
         setStatusMsg('Comparing face to profile photo...');
         const profileImg = new Image();
-        profileImg.src = `/${profile.profile_photo_url}`;
+        profileImg.src = profile.profile_photo_url;
+        profileImg.crossOrigin = 'anonymous';
         await new Promise((resolve) => {
           profileImg.onload = resolve;
           profileImg.onerror = resolve;

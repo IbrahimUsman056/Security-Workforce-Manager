@@ -19,3 +19,4 @@ reportlab
 scikit-learn
 pandas
 joblib
+cloudinary

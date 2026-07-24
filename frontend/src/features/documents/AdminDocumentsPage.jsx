@@ -111,7 +111,7 @@ function StaffDocRows({ user, search }) {
       </td>
       <td style={{ padding: '12px 14px', whiteSpace: 'nowrap' }}>
         <a
-          href={`/${doc.file_url}`}
+          href={doc.file_url}
           target="_blank"
           rel="noreferrer"
           style={{

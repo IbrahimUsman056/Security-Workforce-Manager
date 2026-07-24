@@ -583,7 +583,7 @@ function StaffDashboard() {
           <div className="dash-card" style={{ display: 'flex', gap: '18px', alignItems: 'center' }}>
             {profile?.profile_photo_url ? (
               <img
-                src={`/${profile.profile_photo_url}`}
+                src={profile.profile_photo_url}
                 alt="Me"
                 style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', border: `2px solid ${theme.border}` }}
               />

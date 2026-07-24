@@ -219,7 +219,7 @@ export default function ProfilePage() {
           >
             {profile?.profile_photo_url ? (
               <img
-                src={`/${profile.profile_photo_url}`}
+                src={profile.profile_photo_url}
                 alt="Profile"
                 style={{
                   width: '64px',
@@ -756,7 +756,7 @@ export default function ProfilePage() {
                             </td>
                             <td style={{ padding: '10px 14px' }}>
                               <a
-                                href={`/${doc.file_url}`}
+                                href={doc.file_url}
                                 target="_blank"
                                 rel="noreferrer"
                                 style={{
