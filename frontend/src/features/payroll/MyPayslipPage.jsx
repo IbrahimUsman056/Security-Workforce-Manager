@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { API_BASE_URL } from '../../config';
 
 // Corporate Theme Definitions
 const theme = {
@@ -54,7 +55,7 @@ export default function MyPayslipPage() {
     const token = localStorage.getItem('token');
     const startDate = start;
     const endDate = `${end}T23:59:59`;
-    fetch(`http://localhost:8000/reports/payslip/${user.id}/pdf?start_date=${startDate}&end_date=${endDate}`, {
+    fetch(`${API_BASE_URL}/reports/payslip/${user.id}/pdf?start_date=${startDate}&end_date=${endDate}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {

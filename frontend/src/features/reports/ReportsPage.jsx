@@ -7,6 +7,7 @@ import {
   useGetAttendanceRateQuery,
 } from './reportsApi';
 import { Download, Filter, FileSpreadsheet, CheckCircle, Clock, AlertCircle, Search } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
 function defaultDates() {
   const end = new Date();
@@ -56,21 +57,21 @@ export default function ReportsPage() {
 
   const handleExportPayroll = () => {
     downloadWithAuth(
-      `http://localhost:8000/reports/payroll/export?start_date=${range.startDate}&end_date=${range.endDate}`,
+      `${API_BASE_URL}/reports/payroll/export?start_date=${range.startDate}&end_date=${range.endDate}`,
       'payroll_report.csv'
     );
   };
 
   const handleExportBank = () => {
     downloadWithAuth(
-      `http://localhost:8000/reports/bank-export?start_date=${range.startDate}&end_date=${range.endDate}`,
+      `${API_BASE_URL}/reports/bank-export?start_date=${range.startDate}&end_date=${range.endDate}`,
       'bank_export.csv'
     );
   };
 
   const handleDownloadPayslip = (userId) => {
     downloadWithAuth(
-      `http://localhost:8000/reports/payslip/${userId}/pdf?start_date=${range.startDate}&end_date=${range.endDate}`,
+      `${API_BASE_URL}/reports/payslip/${userId}/pdf?start_date=${range.startDate}&end_date=${range.endDate}`,
       `payslip_${userId}.pdf`
     );
   };

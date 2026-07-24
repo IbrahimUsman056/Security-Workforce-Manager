@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useGetSitesQuery } from '../sites/sitesApi';
 import { useGetInvoicesQuery, useCreateInvoiceMutation, useUpdateInvoiceStatusMutation } from './invoicesApi';
+import { API_BASE_URL } from '../../config';
 
 export default function InvoicesPage() {
   const { data: sites } = useGetSitesQuery();
@@ -34,7 +35,7 @@ export default function InvoicesPage() {
 
   const downloadPdf = (invoiceId) => {
     const token = localStorage.getItem('token');
-    fetch(`http://localhost:8000/invoices/${invoiceId}/pdf`, { headers: { Authorization: `Bearer ${token}` } })
+    fetch(`${API_BASE_URL}/invoices/${invoiceId}/pdf`, { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => res.blob())
       .then((blob) => {
         const link = document.createElement('a');

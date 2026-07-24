@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useGetUsersQuery } from '../users/usersApi';
 import { useGetSitesQuery } from '../sites/sitesApi';
+import { API_BASE_URL } from '../../config';
 
 // Corporate Theme Definitions
 const theme = {
@@ -62,7 +63,7 @@ export default function ManageClientAccessPage() {
     setLoadingAccess(true);
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://localhost:8000/users/client-site-access/all', {
+      const res = await fetch('${API_BASE_URL}/users/client-site-access/all', {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
