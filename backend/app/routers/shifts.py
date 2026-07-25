@@ -157,6 +157,20 @@ def delete_shift(
         raise HTTPException(status_code=404, detail="Shift not found")
     if not check_site_access(db, current_user, shift.site_id):
         raise HTTPException(status_code=403, detail="Not authorized for this site")
+
+    if current_user.role == UserRole.SUPERVISOR:
+        active_assignments = db.exec(
+            select(ShiftAssignment).where(
+                ShiftAssignment.shift_id == shift_id,
+                ShiftAssignment.status == AssignmentStatus.ASSIGNED,
+            )
+        ).all()
+        if active_assignments:
+            raise HTTPException(
+                status_code=403,
+                detail="You cannot delete shifts with staff assigned. Cancel the assignments first, or ask an Admin.",
+            )
+
     db.delete(shift)
     db.commit()
     return {"detail": "Shift deleted"}
