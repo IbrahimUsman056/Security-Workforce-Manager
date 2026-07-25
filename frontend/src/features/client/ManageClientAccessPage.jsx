@@ -84,7 +84,7 @@ export default function ManageClientAccessPage() {
     if (!selectedClientId || !selectedSiteId) return;
     const token = localStorage.getItem('token');
     const res = await fetch(
-      `http://localhost:8000/users/${selectedClientId}/grant-site-access?site_id=${selectedSiteId}`,
+      `${API_BASE_URL}/users/${selectedClientId}/grant-site-access?site_id=${selectedSiteId}`,
       { method: 'POST', headers: { Authorization: `Bearer ${token}` } }
     );
     const data = await res.json();
@@ -95,7 +95,7 @@ export default function ManageClientAccessPage() {
   const handleRevoke = async (clientId, siteId) => {
     const token = localStorage.getItem('token');
     const res = await fetch(
-      `http://localhost:8000/users/${clientId}/revoke-site-access?site_id=${siteId}`,
+      `${API_BASE_URL}/users/${clientId}/revoke-site-access?site_id=${siteId}`,
       { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } }
     );
     const data = await res.json().catch(() => ({}));
