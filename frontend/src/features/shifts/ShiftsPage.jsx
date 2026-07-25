@@ -14,6 +14,7 @@ export default function ShiftsPage() {
   const { data: sites } = useGetSitesQuery();
   const [createShift] = useCreateShiftMutation();
   const [deleteShift] = useDeleteShiftMutation();
+  const [statusMsg, setStatusMsg] = useState('');
   const handleDelete = async (shiftId) => {
     try {
       await deleteShift(shiftId).unwrap();
