@@ -1,1 +1,1 @@
-export const API_BASE_URL = 'https://security-workforce-manager-bju6.onrender.com/';
+export const API_BASE_URL = 'https://security-workforce-manager-bju6.onrender.com';
