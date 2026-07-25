@@ -406,7 +406,7 @@ export default function ShiftsPage() {
                   sites={sites}
                   expanded={expandedShiftId === shift.id}
                   onToggle={() => setExpandedShiftId(expandedShiftId === shift.id ? null : shift.id)}
-                  onDelete={() => deleteShift(shift.id)}
+                  onDelete={() => handleDelete(shift.id)}
                   theme={theme}
                   userRole={user?.role}
                 />
@@ -489,7 +489,7 @@ export default function ShiftsPage() {
 function ShiftRow({ shift, canManage, sites, expanded, onToggle, onDelete, theme, userRole }) {
   const siteName = sites?.find((s) => s.id === shift.site_id)?.name || `Site #${shift.site_id}`;
   const isUnderstaffed = shift.assigned_count < shift.required_count;
-  const isSupervisorBlocked = userRole === 'SUPERVISOR' && shift.assigned_count > 0;
+  const isBlocked = shift.assigned_count > 0;
 
   return (
     <>
@@ -550,26 +550,46 @@ function ShiftRow({ shift, canManage, sites, expanded, onToggle, onDelete, theme
         </td>
         {canManage && (
           <td style={{ padding: '12px 16px', textAlign: 'right' }}>
-            <button
-              onClick={onDelete}
-              disabled={isSupervisorBlocked}
-              title={isSupervisorBlocked ? 'Supervisors cannot delete shifts with staff assigned' : ''}
-              style={{
-                padding: '5px 12px',
-                backgroundColor: 'transparent',
-                color: theme.dangerText,
-                border: `1px solid ${theme.dangerText}`,
-                borderRadius: '6px',
-                fontSize: '12.5px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.dangerBg}
-              onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            >
-              Delete
-            </button>
+            {isBlocked ? (
+              <span className="disabled-action-wrap">
+                <button
+                  disabled
+                  title="This shift still has staff currently assigned"
+                  style={{
+                    padding: '5px 12px',
+                    backgroundColor: 'transparent',
+                    color: theme.dangerText,
+                    border: `1px solid ${theme.dangerText}`,
+                    borderRadius: '6px',
+                    fontSize: '12.5px',
+                    fontWeight: '600',
+                    cursor: 'not-allowed',
+                    opacity: 0.5,
+                  }}
+                >
+                  Delete
+                </button>
+              </span>
+            ) : (
+              <button
+                onClick={onDelete}
+                style={{
+                  padding: '5px 12px',
+                  backgroundColor: 'transparent',
+                  color: theme.dangerText,
+                  border: `1px solid ${theme.dangerText}`,
+                  borderRadius: '6px',
+                  fontSize: '12.5px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.dangerBg}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                Delete
+              </button>
+            )}
           </td>
         )}
       </tr>

@@ -12,11 +12,11 @@ export const assignmentsApi = apiSlice.injectEndpoints({
     }),
     createAssignment: builder.mutation({
       query: (data) => ({ url: '/shift-assignments/', method: 'POST', body: data }),
-      invalidatesTags: ['Assignment'],
+      invalidatesTags: ['Assignment', 'Shift'],
     }),
     cancelAssignment: builder.mutation({
       query: (id) => ({ url: `/shift-assignments/${id}`, method: 'DELETE' }),
-      invalidatesTags: ['Assignment'],
+      invalidatesTags: ['Assignment', 'Shift'],
     }),
   }),
 });

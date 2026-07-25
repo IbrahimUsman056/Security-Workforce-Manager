@@ -1,12 +1,15 @@
 from datetime import datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlmodel import Session, select, func
+from sqlmodel import Session, select, func, delete
 from app.database import get_db
 from app.models.shift import Shift
 from app.models.shift_assignment import ShiftAssignment, AssignmentStatus
 from app.models.site import Site
 from app.models.user import User, UserRole
+from app.models.attendance import Attendance
+from app.models.incident_report import IncidentReport
+from app.models.swap_request import SwapRequest
 from app.schemas.shift import ShiftCreate, ShiftRead, ShiftUpdate
 from app.schemas.suggested_staff import SuggestedStaffEntry
 from app.core.deps import require_role, get_current_user
@@ -36,6 +39,7 @@ def create_shift(
     db.refresh(shift)
     result = ShiftRead.model_validate(shift)
     result.assigned_count = 0
+    result.has_assignment_history = False
     return result
 
 
@@ -72,6 +76,7 @@ def list_shifts(
     # Single bulk query for assignment counts, instead of one query per shift (N+1 fix)
     shift_ids = [s.id for s in shifts]
     counts_by_shift = {}
+    history_shift_ids = set()
     if shift_ids:
         count_rows = db.exec(
             select(ShiftAssignment.shift_id, func.count())
@@ -81,10 +86,18 @@ def list_shifts(
         ).all()
         counts_by_shift = {shift_id: count for shift_id, count in count_rows}
 
+        history_rows = db.exec(
+            select(ShiftAssignment.shift_id)
+            .where(ShiftAssignment.shift_id.in_(shift_ids))
+            .distinct()
+        ).all()
+        history_shift_ids = set(history_rows)
+
     items = []
     for s in shifts:
         item = ShiftRead.model_validate(s)
         item.assigned_count = counts_by_shift.get(s.id, 0)
+        item.has_assignment_history = s.id in history_shift_ids
         items.append(item)
 
     total_pages = (total + page_size - 1) // page_size if total else 1
@@ -115,6 +128,7 @@ def get_shift(
     ).one()
     result = ShiftRead.model_validate(shift)
     result.assigned_count = count
+    result.has_assignment_history = count > 0  # for get_shift/update_shift where `count` already exists
     return result
 
 
@@ -143,6 +157,7 @@ def update_shift(
         .where(ShiftAssignment.shift_id == shift_id, ShiftAssignment.status == AssignmentStatus.ASSIGNED)
     ).one()
     result.assigned_count = count
+    result.has_assignment_history = count > 0  # for get_shift/update_shift where `count` already exists
     return result
 
 
@@ -158,23 +173,28 @@ def delete_shift(
     if not check_site_access(db, current_user, shift.site_id):
         raise HTTPException(status_code=403, detail="Not authorized for this site")
 
-    if current_user.role == UserRole.SUPERVISOR:
-        active_assignments = db.exec(
-            select(ShiftAssignment).where(
-                ShiftAssignment.shift_id == shift_id,
-                ShiftAssignment.status == AssignmentStatus.ASSIGNED,
-            )
-        ).all()
-        if active_assignments:
-            raise HTTPException(
-                status_code=403,
-                detail="You cannot delete shifts with staff assigned. Cancel the assignments first, or ask an Admin.",
-            )
+    assignments = db.exec(
+        select(ShiftAssignment).where(ShiftAssignment.shift_id == shift_id)
+    ).all()
+    active_assignments = [a for a in assignments if a.status == AssignmentStatus.ASSIGNED]
+
+    if active_assignments:
+        raise HTTPException(
+            status_code=400,
+            detail="This shift still has staff currently assigned. Cancel the assignment(s) first.",
+        )
+
+    # No one currently assigned — safe to clean up any leftover assignment
+    # history (cancelled/swapped rows) and anything tied to it, then delete the shift.
+    for assignment in assignments:
+        db.exec(delete(Attendance).where(Attendance.shift_assignment_id == assignment.id))
+        db.exec(delete(IncidentReport).where(IncidentReport.shift_assignment_id == assignment.id))
+        db.exec(delete(SwapRequest).where(SwapRequest.shift_assignment_id == assignment.id))
+        db.delete(assignment)
 
     db.delete(shift)
     db.commit()
     return {"detail": "Shift deleted"}
-
 
 @router.get("/{shift_id}/suggested-staff", response_model=List[SuggestedStaffEntry])
 def get_suggested_staff(

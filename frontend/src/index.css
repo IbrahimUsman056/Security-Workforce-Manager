@@ -418,3 +418,20 @@ a { color: var(--color-primary-light); }
     display: none; /* icon-only logout button on very small screens */
   }
 }
+
+.disabled-action-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.disabled-action-wrap button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.disabled-hint {
+  font-size: 11px;
+  color: var(--color-danger);
+  white-space: nowrap;
+  text-align: center;
+}

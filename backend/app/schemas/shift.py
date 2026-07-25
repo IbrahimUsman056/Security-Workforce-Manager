@@ -20,6 +20,7 @@ class ShiftRead(BaseModel):
     recurrence_rule: Optional[str]
     created_at: datetime
     assigned_count: int = 0
+    has_assignment_history: bool = False
 
     class Config:
         from_attributes = True
