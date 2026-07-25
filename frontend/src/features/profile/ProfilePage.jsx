@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useGetMyProfileQuery, useUpsertProfileMutation } from './profileApi';
 import { useGetMyDocumentsQuery, useUploadDocumentMutation, useDeleteDocumentMutation } from '../documents/documentsApi';
@@ -19,6 +19,18 @@ export default function ProfilePage() {
   const [deleteDocument] = useDeleteDocumentMutation();
 
   const [profileForm, setProfileForm] = useState({ employee_code: '', certification_name: '', hourly_rate: '', bank_account_number: '', photo: null });
+  useEffect(() => {
+    if (profile) {
+      setProfileForm((f) => ({
+        ...f,
+        employee_code: f.employee_code || profile.employee_code || '',
+        certification_name: f.certification_name || profile.certification_name || '',
+        hourly_rate: f.hourly_rate || profile.hourly_rate || '',
+        bank_account_number: f.bank_account_number || profile.bank_account_number || '',
+      }));
+    }
+  }, [profile]);
+  
   const [docForm, setDocForm] = useState({ document_type: 'CNIC', expiry_date: '', file: null });
 
   const handleProfileSubmit = async (e) => {
@@ -77,10 +89,10 @@ export default function ProfilePage() {
       <form onSubmit={handleProfileSubmit} className="inline-form" style={{ flexDirection: 'column', alignItems: 'flex-start', maxWidth: 420 }}>
         {isStaff ? (
           <>
-            <input placeholder="Employee Code" defaultValue={profile?.employee_code} onChange={(e) => setProfileForm({ ...profileForm, employee_code: e.target.value })} required />
-            <input placeholder="Certification (optional)" defaultValue={profile?.certification_name} onChange={(e) => setProfileForm({ ...profileForm, certification_name: e.target.value })} />
-            <input type="number" placeholder="Hourly rate (optional)" defaultValue={profile?.hourly_rate} onChange={(e) => setProfileForm({ ...profileForm, hourly_rate: e.target.value })} />
-            <input placeholder="Bank account number (optional)" defaultValue={profile?.bank_account_number} onChange={(e) => setProfileForm({ ...profileForm, bank_account_number: e.target.value })} />
+            <input placeholder="Employee Code" value={profileForm.employee_code} onChange={(e) => setProfileForm({ ...profileForm, employee_code: e.target.value })} required />
+            <input placeholder="Certification (optional)" value={profileForm.certification_name} onChange={(e) => setProfileForm({ ...profileForm, certification_name: e.target.value })} />
+            <input type="number" placeholder="Hourly rate (optional)" value={profileForm.hourly_rate} onChange={(e) => setProfileForm({ ...profileForm, hourly_rate: e.target.value })} />
+            <input placeholder="Bank account number (optional)" value={profileForm.bank_account_number} onChange={(e) => setProfileForm({ ...profileForm, bank_account_number: e.target.value })} />
             <label>
               Profile photo (used for face verification at check-in):
               <input type="file" accept="image/*" capture="user" onChange={(e) => setProfileForm({ ...profileForm, photo: e.target.files[0] })} required={!profile?.profile_photo_url} />
