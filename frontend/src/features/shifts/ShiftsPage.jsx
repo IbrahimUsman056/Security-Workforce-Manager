@@ -14,13 +14,21 @@ export default function ShiftsPage() {
   const { data: sites } = useGetSitesQuery();
   const [createShift] = useCreateShiftMutation();
   const [deleteShift] = useDeleteShiftMutation();
-  const [statusMsg, setStatusMsg] = useState('');
+  const [deleteErrors, setDeleteErrors] = useState({}); // { [shiftId]: errorMessage }
+
   const handleDelete = async (shiftId) => {
     try {
       await deleteShift(shiftId).unwrap();
-      setStatusMsg('Shift deleted.');
+      setDeleteErrors((prev) => {
+        const next = { ...prev };
+        delete next[shiftId];
+        return next;
+      });
     } catch (err) {
-      setStatusMsg(err?.data?.detail || 'Failed to delete shift.');
+      setDeleteErrors((prev) => ({
+        ...prev,
+        [shiftId]: err?.data?.detail || 'Shift has assignment history, cant delete',
+      }));
     }
   };
 
@@ -146,7 +154,6 @@ export default function ShiftsPage() {
         }}>
           Shifts
         </h2>
-        {statusMsg && <p className="card">{statusMsg}</p>}
         <p style={{
           margin: '4px 0 0 0',
           fontSize: '14px',
@@ -409,6 +416,7 @@ export default function ShiftsPage() {
                   onDelete={() => handleDelete(shift.id)}
                   theme={theme}
                   userRole={user?.role}
+                  deleteError={deleteErrors[shift.id]}
                 />
               )) : (
                 <tr>
@@ -486,7 +494,7 @@ export default function ShiftsPage() {
   );
 }
 
-function ShiftRow({ shift, canManage, sites, expanded, onToggle, onDelete, theme, userRole }) {
+function ShiftRow({ shift, canManage, sites, expanded, onToggle, onDelete, theme, userRole, deleteError }) {
   const siteName = sites?.find((s) => s.id === shift.site_id)?.name || `Site #${shift.site_id}`;
   const isUnderstaffed = shift.assigned_count < shift.required_count;
   const isBlocked = shift.assigned_count > 0;
@@ -571,24 +579,31 @@ function ShiftRow({ shift, canManage, sites, expanded, onToggle, onDelete, theme
                 </button>
               </span>
             ) : (
-              <button
-                onClick={onDelete}
-                style={{
-                  padding: '5px 12px',
-                  backgroundColor: 'transparent',
-                  color: theme.dangerText,
-                  border: `1px solid ${theme.dangerText}`,
-                  borderRadius: '6px',
-                  fontSize: '12.5px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.dangerBg}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-              >
-                Delete
-              </button>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                <button
+                  onClick={onDelete}
+                  style={{
+                    padding: '5px 12px',
+                    backgroundColor: 'transparent',
+                    color: theme.dangerText,
+                    border: `1px solid ${theme.dangerText}`,
+                    borderRadius: '6px',
+                    fontSize: '12.5px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.dangerBg}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  Delete
+                </button>
+                {deleteError && (
+                  <span style={{ fontSize: 11, color: theme.dangerText, maxWidth: 200, textAlign: 'right' }}>
+                    {deleteError}
+                  </span>
+                )}
+              </div>
             )}
           </td>
         )}

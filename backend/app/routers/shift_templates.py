@@ -99,5 +99,10 @@ def generate_shifts_now(
 
     today = date.today()
     window_end = today + timedelta(days=days_ahead)
-    count = generate_shifts_from_template(db, template, today, window_end)
-    return {"detail": f"Generated {count} new shifts"}
+    result = generate_shifts_from_template(db, template, today, window_end)
+    return {
+        "detail": (
+            f"Checked {result['days_checked']} matching day(s) in the next {days_ahead} days: "
+            f"{result['created']} new shift(s) created, {result['skipped_existing']} already existed."
+        )
+    }

@@ -15,6 +15,29 @@ export default function TemplatesPage() {
   const [createTemplate] = useCreateTemplateMutation();
   const [generateShifts] = useGenerateShiftsMutation();
   const [deleteTemplate] = useDeleteTemplateMutation();
+  const [rowErrors, setRowErrors] = useState({}); // { [templateId]: message }
+
+  const handleGenerate = async (id) => {
+    try {
+      const res = await generateShifts(id).unwrap();
+      setRowErrors((prev) => ({ ...prev, [id]: { type: 'success', msg: res.detail } }));
+    } catch (err) {
+      setRowErrors((prev) => ({ ...prev, [id]: { type: 'error', msg: err?.data?.detail || 'Failed to generate shifts' } }));
+    }
+  };
+
+  const handleDeactivate = async (id) => {
+    try {
+      await deleteTemplate(id).unwrap();
+      setRowErrors((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    } catch (err) {
+      setRowErrors((prev) => ({ ...prev, [id]: { type: 'error', msg: err?.data?.detail || 'Failed to deactivate template' } }));
+    }
+  };
 
   const [form, setForm] = useState({
     site_id: '',
@@ -424,44 +447,51 @@ export default function TemplatesPage() {
                     {t.start_date} &rarr; {t.end_date}
                   </td>
                   <td style={{ padding: '12px 14px', textAlign: 'right', whiteSpace: 'nowrap' }}>
-                    <div style={{ display: 'inline-flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                      <button
-                        onClick={() => generateShifts(t.id)}
-                        style={{
-                          padding: '5px 10px',
-                          backgroundColor: theme.actionSecondaryBg,
-                          color: theme.textMain,
-                          border: `1px solid ${theme.border}`,
-                          borderRadius: '6px',
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          cursor: 'pointer',
-                          transition: 'all 0.15s ease'
-                        }}
-                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.border}
-                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = theme.actionSecondaryBg}
-                      >
-                        Generate Shifts
-                      </button>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-start', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                      <div>
+                        <button
+                          onClick={() => handleGenerate(t.id)}
+                          style={{
+                            padding: '5px 10px',
+                            backgroundColor: theme.actionSecondaryBg,
+                            color: theme.textMain,
+                            border: `1px solid ${theme.border}`,
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease'
+                          }}
+                          onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.border}
+                          onMouseOut={(e) => e.currentTarget.style.backgroundColor = theme.actionSecondaryBg}
+                        >
+                          Generate Shifts
+                        </button>
 
-                      <button
-                        onClick={() => deleteTemplate(t.id)}
-                        style={{
-                          padding: '5px 10px',
-                          backgroundColor: 'transparent',
-                          color: theme.dangerText,
-                          border: `1px solid ${theme.dangerText}`,
-                          borderRadius: '6px',
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          cursor: 'pointer',
-                          transition: 'all 0.15s ease'
-                        }}
-                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.dangerBg}
-                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                      >
-                        Deactivate
-                      </button>
+                        <button
+                          onClick={() => handleDeactivate(t.id)}
+                          style={{
+                            padding: '5px 10px',
+                            backgroundColor: 'transparent',
+                            color: theme.dangerText,
+                            border: `1px solid ${theme.dangerText}`,
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease'
+                          }}
+                          onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.dangerBg}
+                          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                        >
+                          Deactivate
+                        </button>
+                      </div>
+                      {rowErrors[t.id] && (
+                        <span style={{ fontSize: 11, color: rowErrors[t.id].type === 'success' ? 'var(--color-success)' : 'var(--color-danger)' }}>
+                          {rowErrors[t.id].msg}
+                        </span>
+                      )}
                     </div>
                   </td>
                 </tr>
