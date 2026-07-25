@@ -63,7 +63,7 @@ export default function ManageClientAccessPage() {
     setLoadingAccess(true);
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('${API_BASE_URL}/users/client-site-access/all', {
+      const res = await fetch(`${API_BASE_URL}/users/client-site-access/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
