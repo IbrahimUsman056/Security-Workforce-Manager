@@ -14,6 +14,14 @@ export default function ShiftsPage() {
   const { data: sites } = useGetSitesQuery();
   const [createShift] = useCreateShiftMutation();
   const [deleteShift] = useDeleteShiftMutation();
+  const handleDelete = async (shiftId) => {
+    try {
+      await deleteShift(shiftId).unwrap();
+      setStatusMsg('Shift deleted.');
+    } catch (err) {
+      setStatusMsg(err?.data?.detail || 'Failed to delete shift.');
+    }
+  };
 
   const [filters, setFilters] = useState({ siteId: '', startDate: '', endDate: '', page: 1, pageSize: 50 });
   const { data, isLoading, isFetching } = useGetShiftsQuery(filters);
@@ -137,6 +145,7 @@ export default function ShiftsPage() {
         }}>
           Shifts
         </h2>
+        {statusMsg && <p className="card">{statusMsg}</p>}
         <p style={{
           margin: '4px 0 0 0',
           fontSize: '14px',
@@ -398,6 +407,7 @@ export default function ShiftsPage() {
                   onToggle={() => setExpandedShiftId(expandedShiftId === shift.id ? null : shift.id)}
                   onDelete={() => deleteShift(shift.id)}
                   theme={theme}
+                  userRole={user?.role}
                 />
               )) : (
                 <tr>
@@ -475,9 +485,10 @@ export default function ShiftsPage() {
   );
 }
 
-function ShiftRow({ shift, canManage, sites, expanded, onToggle, onDelete, theme }) {
+function ShiftRow({ shift, canManage, sites, expanded, onToggle, onDelete, theme, userRole }) {
   const siteName = sites?.find((s) => s.id === shift.site_id)?.name || `Site #${shift.site_id}`;
   const isUnderstaffed = shift.assigned_count < shift.required_count;
+  const isSupervisorBlocked = userRole === 'SUPERVISOR' && shift.assigned_count > 0;
 
   return (
     <>
@@ -540,6 +551,8 @@ function ShiftRow({ shift, canManage, sites, expanded, onToggle, onDelete, theme
           <td style={{ padding: '12px 16px', textAlign: 'right' }}>
             <button
               onClick={onDelete}
+              disabled={isSupervisorBlocked}
+              title={isSupervisorBlocked ? 'Supervisors cannot delete shifts with staff assigned' : ''}
               style={{
                 padding: '5px 12px',
                 backgroundColor: 'transparent',
