@@ -38,9 +38,13 @@ export default function ReportsPage() {
   const { data: incidentStats, isLoading: incidentLoading } = useGetIncidentsBySiteQuery();
   const { data: attendanceRate, isLoading: attendanceLoading } = useGetAttendanceRateQuery(range);
 
+  const [filterApplied, setFilterApplied] = useState(false);
+
   const handleFilter = (e) => {
     e.preventDefault();
     setRange({ startDate: start, endDate: `${end}T23:59:59` });
+    setFilterApplied(true);
+    setTimeout(() => setFilterApplied(false), 1500);
   };
 
   const downloadWithAuth = (url, filename) => {
@@ -298,6 +302,7 @@ export default function ReportsPage() {
           >
             <Filter size={14} /> Filter Range
           </button>
+          {filterApplied && <p style={{ color: 'var(--color-success)', fontSize: 13 }}>Filter applied.</p>}
 
           {isAdmin && (
             <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto', flexWrap: 'wrap' }}>

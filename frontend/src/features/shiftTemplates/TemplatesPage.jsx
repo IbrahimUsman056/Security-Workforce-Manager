@@ -401,12 +401,13 @@ export default function TemplatesPage() {
                 color: '#ffffff',
                 borderBottom: `1px solid ${theme.border}`
               }}>
-                <th style={{ padding: '12px 14px', fontWeight: '600' }}>Name</th>
-                <th style={{ padding: '12px 14px', fontWeight: '600' }}>Site</th>
-                <th style={{ padding: '12px 14px', fontWeight: '600' }}>Time</th>
-                <th style={{ padding: '12px 14px', fontWeight: '600' }}>Days</th>
-                <th style={{ padding: '12px 14px', fontWeight: '600' }}>Range</th>
-                <th style={{ padding: '12px 14px', fontWeight: '600', textAlign: 'right' }}>Actions</th>
+                <th style={{ padding: '12px 14px', fontWeight: '600', textAlign: 'center'  }}>Name</th>
+                <th style={{ padding: '12px 14px', fontWeight: '600', textAlign: 'center'  }}>Site</th>
+                <th style={{ padding: '12px 14px', fontWeight: '600', textAlign: 'center'  }}>Time</th>
+                <th style={{ padding: '12px 14px', fontWeight: '600', textAlign: 'center'  }}>Days</th>
+                <th style={{ padding: '12px 14px', fontWeight: '600', textAlign: 'center'  }}>Range</th>
+                <th style={{ padding: '12px 14px', fontWeight: '600', textAlign: 'center'  }}>Status</th>
+                <th style={{ padding: '12px 14px', fontWeight: '600', textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -446,6 +447,11 @@ export default function TemplatesPage() {
                   <td style={{ padding: '12px 14px', whiteSpace: 'nowrap', color: theme.textMuted }}>
                     {t.start_date} &rarr; {t.end_date}
                   </td>
+                  <td style={{ padding: '12px 14px', whiteSpace: 'nowrap', color: theme.textMuted }}>
+                    <span className={`badge ${t.is_active ? 'badge-approved' : 'badge-neutral'}`}>
+                      {t.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
                   <td style={{ padding: '12px 14px', textAlign: 'right', whiteSpace: 'nowrap' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-start', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                       <div>
@@ -470,6 +476,7 @@ export default function TemplatesPage() {
 
                         <button
                           onClick={() => handleDeactivate(t.id)}
+                          disabled={!t.is_active}
                           style={{
                             padding: '5px 10px',
                             backgroundColor: 'transparent',
@@ -484,7 +491,7 @@ export default function TemplatesPage() {
                           onMouseOver={(e) => e.currentTarget.style.backgroundColor = theme.dangerBg}
                           onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                         >
-                          Deactivate
+                          {t.is_active ? 'Deactivate' : 'Deactivated'}
                         </button>
                       </div>
                       {rowErrors[t.id] && (

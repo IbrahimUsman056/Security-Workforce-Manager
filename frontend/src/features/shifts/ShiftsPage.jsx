@@ -33,6 +33,7 @@ export default function ShiftsPage() {
   };
 
   const [filters, setFilters] = useState({ siteId: '', startDate: '', endDate: '', page: 1, pageSize: 50 });
+    const [rawEndDate, setRawEndDate] = useState('');
   const { data, isLoading, isFetching } = useGetShiftsQuery(filters);
 
   const [form, setForm] = useState({ site_id: '', start_time: '', end_time: '', required_count: 1 });
@@ -321,8 +322,11 @@ export default function ShiftsPage() {
             <input
               id="filter-end-date"
               type="date"
-              value={filters.endDate}
-              onChange={(e) => handleFilterChange('endDate', e.target.value ? `${e.target.value}T23:59:59` : '')}
+              value={rawEndDate}
+              onChange={(e) => {
+                setRawEndDate(e.target.value);
+                handleFilterChange('endDate', e.target.value ? `${e.target.value}T23:59:59` : '');
+              }}
               style={inputStyle}
             />
           </div>
