@@ -71,32 +71,34 @@ export default function MyShiftsPage() {
       const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg'));
       const selfieFile = new File([blob], 'selfie.jpg', { type: 'image/jpeg' });
 
-      let faceMatchScore = null;
-      if (profile?.profile_photo_url) {
-        setStatusMsg('Comparing face to profile photo...');
-        const profileImg = new Image();
-        profileImg.src = profile.profile_photo_url;
-        profileImg.crossOrigin = 'anonymous';
-        await new Promise((resolve) => {
-          profileImg.onload = resolve;
-          profileImg.onerror = resolve;
-        });
-
-        const selfieImg = new Image();
-        selfieImg.src = URL.createObjectURL(blob);
-        await new Promise((resolve) => {
-          selfieImg.onload = resolve;
-        });
-
-        const result = await compareFaces(profileImg, selfieImg);
-        faceMatchScore = result.score;
-        setLiveScore(result.error ? null : result.score);
-        if (result.error) {
-          setStatusMsg(`Warning: ${result.error}`);
-        } else {
-          setStatusMsg(`Face match: ${(result.score * 100).toFixed(0)}%`);
-        }
+      if (!profile?.profile_photo_url) {
+        setStatusMsg('You must upload a profile photo before you can check in.');
+        setProcessing(false);
+        return;
       }
+
+      setStatusMsg('Comparing face to profile photo...');
+      const profileImg = new Image();
+      profileImg.src = profile.profile_photo_url;
+      profileImg.crossOrigin = 'anonymous';
+      await new Promise((resolve) => { profileImg.onload = resolve; profileImg.onerror = resolve; });
+
+      const selfieImg = new Image();
+      selfieImg.src = URL.createObjectURL(blob);
+      await new Promise((resolve) => { selfieImg.onload = resolve; });
+
+      const result = await compareFaces(profileImg, selfieImg);
+
+      if (result.error) {
+        setLiveScore(null);
+        setStatusMsg(`Face verification failed: ${result.error}. Please try again with better lighting.`);
+        setProcessing(false);
+        return;
+      }
+
+      const faceMatchScore = result.score;
+      setLiveScore(faceMatchScore);
+      setStatusMsg(`Face match: ${(faceMatchScore * 100).toFixed(0)}%`);
 
       setStatusMsg((prev) => `${prev} — Getting location...`);
       const { lat, lng } = await getLocation();
@@ -105,7 +107,7 @@ export default function MyShiftsPage() {
       fd.append('shift_assignment_id', assignmentId);
       fd.append('lat', lat);
       fd.append('lng', lng);
-      if (faceMatchScore !== null) fd.append('face_match_score', faceMatchScore);
+      fd.append('face_match_score', faceMatchScore);
       fd.append('selfie', selfieFile);
 
       setStatusMsg('Submitting check-in...');
