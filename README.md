@@ -5,9 +5,17 @@ A full-stack, multi-tenant workforce management platform built for security comp
 Originally built as an internship project (starting from a MERN-based background), this version was deliberately built with **FastAPI + SQLModel** on the backend to deepen Python/backend skills, while keeping **React + Redux Toolkit** on the frontend.
 
 **Live demo:** [security-workforce-manager-iota.vercel.app](https://security-workforce-manager-iota.vercel.app)
+
 **API docs:** [security-workforce-manager-bju6.onrender.com/docs](https://security-workforce-manager-bju6.onrender.com/docs)
 
-> Demo credentials: any seeded account, e.g. `admin@sos.com` / `security2468`
+> Demo credentials (all roles share the same password: `Demo@1234`):
+
+| Role       | Email                         |
+|------------|-------------------------------|
+| Admin      | demo.admin@example.com        |
+| Supervisor | demo.supervisor@example.com   |
+| Staff      | demo.staff@example.com        |
+| Client     | demo.client@example.com       |
 
 ---
 
