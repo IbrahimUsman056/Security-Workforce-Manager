@@ -1,0 +1,139 @@
+# Security Workforce Manager
+
+A full-stack, multi-tenant workforce management platform built for security companies to manage guards, sites, shifts, attendance, incidents, payroll, and client relationships — end to end.
+
+Originally built as an internship project (starting from a MERN-based FMS/CTMP background), this version was deliberately built with **FastAPI + SQLModel** on the backend to deepen Python/backend skills, while keeping **React + Redux Toolkit** on the frontend.
+
+**Live demo:** [security-workforce-manager-iota.vercel.app](https://security-workforce-manager-iota.vercel.app)
+**API docs:** [security-workforce-manager-bju6.onrender.com/docs](https://security-workforce-manager-bju6.onrender.com/docs)
+
+> Demo credentials: any seeded account, e.g. `admin@sos.com` / `security2468`
+
+---
+
+## Screenshots
+
+<!-- Add screenshots here, e.g.: -->
+<!-- ![Admin Dashboard](./docs/screenshots/admin-dashboard.png) -->
+<!-- ![Shift Management](./docs/screenshots/shifts.png) -->
+<!-- ![Face Verification Check-In](./docs/screenshots/checkin.png) -->
+<!-- ![Client Portal](./docs/screenshots/client-portal.png) -->
+
+*(Screenshots: Admin dashboard, Shift scheduling, Geofenced check-in with face verification, Incident reporting, Client portal, ML staffing forecast)*
+
+---
+
+## What It Does
+
+Security companies deploying guards across multiple client sites need to answer three questions in real time: **who's scheduled where, did they actually show up, and what happened while they were there.** This platform handles that end to end, plus the operational layer around it — payroll, billing, compliance documents, and multi-tenant isolation so multiple security companies can use the same deployment without ever seeing each other's data.
+
+### Core Features
+
+- **Multi-tenancy** — each organization's data (staff, sites, shifts, records) is fully isolated at the database query level
+- **Four distinct roles** — Admin (full org control), Supervisor (scoped to assigned sites), Staff (their own shifts/attendance), Client (read-only portal for their own site's coverage/incidents/invoices)
+- **Geofenced attendance with face verification** — staff check in via mobile browser; the app validates GPS location against a site's geofence **and** runs on-device face recognition (face-api.js) comparing a live selfie to their profile photo — both checks are required, not optional, to mark attendance
+- **Shift scheduling** — manual scheduling, recurring shift templates (auto-generates shifts on a rolling basis), and a greedy staff-suggestion optimizer that ranks eligible candidates by conflict-free availability and weekly hour balance
+- **Incident reporting with SLA escalation** — severity-based response deadlines (Critical: 1hr, High: 4hr, Medium: 24hr, Low: 72hr), auto-escalated and staff/admins notified if a report goes unreviewed past deadline
+- **Payroll & invoicing** — hourly-rate calculations, bonuses/deductions, PDF payslips, bank-transfer CSV export, and client invoicing based on contracted vs. actual hours worked
+- **Document management** — staff upload CNIC/licenses/contracts with expiry tracking and automated renewal reminders
+- **Client portal** — clients see live coverage status, incidents, and invoices for their own site(s) only, with zero visibility into internal staff operations
+- **ML-based demand forecasting** — a trained Gradient Boosting Regressor predicts next-week staffing needs per site from historical shift data, benchmarked honestly against a moving-average baseline (~19% MAE improvement)
+- **Audit logging** — every sensitive action (site/shift changes, user/role updates, incident status changes) is logged with before/after state
+- **Live dashboards** — role-specific dashboards with real charts (attendance trends, incident heatmaps, staff hours, ML forecasts) instead of static summary pages
+
+---
+
+## Tech Stack
+
+**Backend**
+- FastAPI + SQLModel (async-ready ORM built on SQLAlchemy + Pydantic)
+- MySQL / TiDB (MySQL-compatible distributed SQL, used in production)
+- JWT authentication with role-based access control
+- APScheduler for background jobs (SLA escalation, reminders, recurring shift generation, expiry checks)
+- scikit-learn + NumPy for the demand forecasting model
+- Cloudinary for persistent file storage (profile photos, selfies, incident photos, documents)
+- ReportLab for PDF generation (payslips, invoices)
+
+**Frontend**
+- React (Vite) + Redux Toolkit + RTK Query
+- Recharts for data visualization
+- face-api.js for client-side face recognition
+- Custom design system — corporate/enterprise theme, collapsible sidebar navigation
+
+**Infrastructure**
+- Frontend: Vercel
+- Backend: Render
+- Database: TiDB Cloud
+- File storage: Cloudinary
+
+---
+
+## Architecture Highlights
+
+- **Multi-tenancy via shared schema** — every table scoped by `organization_id`, enforced at the query layer on every endpoint, not just at the UI level
+- **Role-based data scoping** — Supervisors only ever see/manage sites where `Site.supervisor_id` matches them; this is enforced server-side, not hidden by frontend routing alone
+- **N+1 query prevention** — list endpoints (e.g. shifts with 1000+ rows) use bulk aggregate queries and pagination instead of per-row lookups
+- **Honest ML** — the forecasting model is evaluated against a naive baseline and the comparison is shown transparently in the UI, rather than presenting predictions as more authoritative than they are
+
+---
+
+## Project Structure
+backend/
+├── app/
+│ ├── models/ # SQLModel table definitions
+│ ├── schemas/ # Pydantic request/response schemas
+│ ├── routers/ # API endpoints, grouped by domain
+│ ├── services/ # Business logic (scheduling, geofence, payroll, ML, etc.)
+│ ├── jobs/ # APScheduler background tasks
+│ └── core/ # Auth, security, dependency injection
+├── ml/
+│ └── train_demand_model.py # Standalone training script
+└── seed.py # Generates realistic demo data (200+ rows per table)
+
+frontend/
+├── src/
+│ ├── features/ # Domain-organized: auth, sites, shifts, incidents, payroll, etc.
+│ ├── components/ # Shared layout (Sidebar, Layout, ConfirmDialog)
+│ └── api/ # RTK Query base configuration
+
+---
+
+## Running Locally
+
+### Backend
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate          # Windows
+pip install -r requirements.txt
+cp .env.example .env           # fill in your own DB/Cloudinary/secret values
+uvicorn app.main:app --reload
+```
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Seed demo data (optional)
+```bash
+cd backend
+python seed.py
+```
+
+---
+
+## What I'd Build Next
+
+- Celery + Redis to replace APScheduler for more robust distributed background jobs
+- WebSockets for real-time notifications instead of polling
+- PWA support for installable, offline-capable mobile access
+- Docker Compose for one-command local environment setup
+
+---
+
+## License
+
+This project was built as a personal learning/portfolio project. Feel free to explore the code for reference.
