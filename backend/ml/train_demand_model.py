@@ -23,7 +23,7 @@ from app.models.shift import Shift
 from app.models.organization import Organization
 
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "models")
-FEATURE_NAMES = ["day_of_week", "is_weekend", "month", "day_of_month", "rolling_avg_7d"]
+FEATURE_NAMES = ["day_of_week", "is_weekend", "rolling_avg_7d"]
 
 
 def load_daily_demand(db: Session, organization_id: int) -> dict:
@@ -44,7 +44,7 @@ def build_feature_rows(daily: dict) -> tuple[list, list, list]:
 
     X_rows = []
     y_rows = []
-    site_ids_row = []  # kept separately, NOT used as a model feature
+    site_ids_row = []
 
     for site_id, entries in by_site.items():
         entries.sort(key=lambda e: e[0])
@@ -60,8 +60,6 @@ def build_feature_rows(daily: dict) -> tuple[list, list, list]:
             row = [
                 day.weekday(),
                 1 if day.weekday() in (5, 6) else 0,
-                day.month,
-                day.day,
                 rolling_avg,
             ]
             X_rows.append(row)
@@ -80,13 +78,36 @@ def train_for_organization(db: Session, org: Organization) -> bool:
         print(f"[{org.subdomain}] Skipped — only {len(daily)} site-day records (need at least 30).")
         return False
 
-    X_rows, y_rows, _ = build_feature_rows(daily)
-    X = np.array(X_rows, dtype=float)
-    y = np.array(y_rows, dtype=float)
+    # Sort by date so we can split chronologically instead of randomly —
+    # this is the honest way to evaluate a forecasting model: train on the past,
+    # test on more recent data it hasn't seen, rather than a random shuffle
+    # which can let future information leak into training.
+    sorted_items = sorted(daily.items(), key=lambda kv: kv[1])  # placeholder, corrected below
+    dated_daily = sorted(daily.items(), key=lambda kv: kv[0][1])  # sort by date
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    split_index = int(len(dated_daily) * 0.8)
+    train_items = dict(dated_daily[:split_index])
+    test_items = dict(dated_daily[split_index:])
 
-    model = GradientBoostingRegressor(n_estimators=150, max_depth=3, learning_rate=0.1, random_state=42)
+    X_train_rows, y_train_rows, _ = build_feature_rows(train_items)
+    X_test_rows, y_test_rows, _ = build_feature_rows(test_items)
+
+    if len(X_test_rows) < 5:
+        print(f"[{org.subdomain}] Skipped — not enough recent data for a meaningful test split.")
+        return False
+
+    X_train = np.array(X_train_rows, dtype=float)
+    y_train = np.array(y_train_rows, dtype=float)
+    X_test = np.array(X_test_rows, dtype=float)
+    y_test = np.array(y_test_rows, dtype=float)
+
+    model = GradientBoostingRegressor(
+        n_estimators=80,
+        max_depth=2,
+        learning_rate=0.05,
+        subsample=0.8,
+        random_state=42,
+    )
     model.fit(X_train, y_train)
 
     predictions = model.predict(X_test)

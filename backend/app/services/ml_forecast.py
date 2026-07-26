@@ -57,8 +57,6 @@ def predict_next_7_days(db: Session, site_id: int, organization_id: int) -> list
         row = [[
             target_date.weekday(),
             1 if target_date.weekday() in (5, 6) else 0,
-            target_date.month,
-            target_date.day,
             rolling_avg,
         ]]
         X = np.array(row, dtype=float)
