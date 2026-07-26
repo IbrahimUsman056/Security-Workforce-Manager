@@ -2,7 +2,7 @@
 
 A full-stack, multi-tenant workforce management platform built for security companies to manage guards, sites, shifts, attendance, incidents, payroll, and client relationships — end to end.
 
-Originally built as an internship project (starting from a MERN-based FMS/CTMP background), this version was deliberately built with **FastAPI + SQLModel** on the backend to deepen Python/backend skills, while keeping **React + Redux Toolkit** on the frontend.
+Originally built as an internship project (starting from a MERN-based background), this version was deliberately built with **FastAPI + SQLModel** on the backend to deepen Python/backend skills, while keeping **React + Redux Toolkit** on the frontend.
 
 **Live demo:** [security-workforce-manager-iota.vercel.app](https://security-workforce-manager-iota.vercel.app)
 **API docs:** [security-workforce-manager-bju6.onrender.com/docs](https://security-workforce-manager-bju6.onrender.com/docs)
@@ -15,18 +15,22 @@ Originally built as an internship project (starting from a MERN-based FMS/CTMP b
 
 <!-- Add screenshots here, e.g.: -->
 <!-- ![Admin Dashboard](./docs/screenshots/admin-dashboard.png) -->
-<img width="946" height="539" alt="image" src="https://github.com/user-attachments/assets/a8f51083-393e-4739-b72d-9ef31798acbb" />
+<img width="646" height="439" alt="image" src="https://github.com/user-attachments/assets/a8f51083-393e-4739-b72d-9ef31798acbb" />
 
 <!-- ![Shift Management](./docs/screenshots/shifts.png) -->
-<img width="947" height="539" alt="image" src="https://github.com/user-attachments/assets/1a51fc38-6288-4a6b-8892-eb282bcc9ff7" />
+<img width="646" height="439" alt="image" src="https://github.com/user-attachments/assets/1a51fc38-6288-4a6b-8892-eb282bcc9ff7" />
 
 <!-- ![Face Verification Check-In](./docs/screenshots/checkin.png) -->
-<img width="943" height="539" alt="image" src="https://github.com/user-attachments/assets/68b80136-d3e8-4414-b524-e1c23706612c" />
-<img width="948" height="534" alt="image" src="https://github.com/user-attachments/assets/53490f6a-62ab-4adf-abfa-57bc0a1b4b00" />
+<img width="646" height="439" alt="image" src="https://github.com/user-attachments/assets/68b80136-d3e8-4414-b524-e1c23706612c" />
+
+
+<img width="646" height="439" alt="image" src="https://github.com/user-attachments/assets/8538f373-cdf9-44e9-a303-6f81426473b5" />
 
 <!-- ![Client Portal](./docs/screenshots/client-portal.png) -->
-<img width="948" height="539" alt="image" src="https://github.com/user-attachments/assets/eda17541-474b-4a9a-bc3a-2ff5f8db66f9" />
+<img width="646" height="439" alt="image" src="https://github.com/user-attachments/assets/eda17541-474b-4a9a-bc3a-2ff5f8db66f9" />
 
+
+<img width="646" height="439" alt="image" src="https://github.com/user-attachments/assets/bd4afc58-67e5-4416-85a8-de35932822cc" />
 
 *(Screenshots: Admin dashboard, Shift scheduling, Geofenced check-in with face verification, Incident reporting, Client portal, ML staffing forecast)*
 
@@ -87,23 +91,11 @@ Security companies deploying guards across multiple client sites need to answer 
 ---
 
 ## Project Structure
-backend/
-├── app/
-│ ├── models/ # SQLModel table definitions
-│ ├── schemas/ # Pydantic request/response schemas
-│ ├── routers/ # API endpoints, grouped by domain
-│ ├── services/ # Business logic (scheduling, geofence, payroll, ML, etc.)
-│ ├── jobs/ # APScheduler background tasks
-│ └── core/ # Auth, security, dependency injection
-├── ml/
-│ └── train_demand_model.py # Standalone training script
-└── seed.py # Generates realistic demo data (200+ rows per table)
+<img width="165" height="251" alt="image" src="https://github.com/user-attachments/assets/44d916a0-ba6b-445e-b9ea-f14962ac8798" />
 
-frontend/
-├── src/
-│ ├── features/ # Domain-organized: auth, sites, shifts, incidents, payroll, etc.
-│ ├── components/ # Shared layout (Sidebar, Layout, ConfirmDialog)
-│ └── api/ # RTK Query base configuration
+
+<img width="152" height="221" alt="image" src="https://github.com/user-attachments/assets/233465bc-c2f1-4844-bc66-409a3ef4d591" />
+
 
 ---
 
@@ -124,12 +116,6 @@ uvicorn app.main:app --reload
 cd frontend
 npm install
 npm run dev
-```
-
-### Seed demo data (optional)
-```bash
-cd backend
-python seed.py
 ```
 
 ---
