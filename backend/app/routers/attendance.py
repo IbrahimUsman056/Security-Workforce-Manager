@@ -24,8 +24,8 @@ def check_in(
     shift_assignment_id: int = Form(...),
     lat: float = Form(...),
     lng: float = Form(...),
-    face_match_score: Optional[float] = Form(None),
-    selfie: Optional[UploadFile] = File(None),
+    face_match_score: float = Form(...),
+    selfie: UploadFile = File(...),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -46,6 +46,7 @@ def check_in(
         raise HTTPException(status_code=400, detail="Already checked in for this shift")
 
     site = db.get(Site, shift.site_id)
+
     within_geofence = is_within_geofence(site.lat, site.lng, lat, lng, site.geofence_radius_m)
     if not within_geofence:
         raise HTTPException(
@@ -53,13 +54,15 @@ def check_in(
             detail="You are not within the site's geofence radius to check in",
         )
 
-    selfie_url = None
-    if selfie:
-        selfie_url = save_selfie(selfie)
+    face_match_passed = face_match_score >= FACE_MATCH_THRESHOLD
+    if not face_match_passed:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Face verification failed (match score {face_match_score:.0%}). "
+                   f"Please retake your selfie in better lighting and try again.",
+        )
 
-    face_match_passed = None
-    if face_match_score is not None:
-        face_match_passed = face_match_score >= FACE_MATCH_THRESHOLD
+    selfie_url = save_selfie(selfie)
 
     now = datetime.utcnow()
     minutes_late = (now - shift.start_time).total_seconds() / 60
@@ -92,7 +95,6 @@ def check_in(
     db.commit()
     db.refresh(attendance)
     return attendance
-
 
 @router.post("/check-out/{shift_assignment_id}", response_model=AttendanceRead)
 def check_out(
