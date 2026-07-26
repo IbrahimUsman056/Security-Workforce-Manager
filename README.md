@@ -15,9 +15,18 @@ Originally built as an internship project (starting from a MERN-based FMS/CTMP b
 
 <!-- Add screenshots here, e.g.: -->
 <!-- ![Admin Dashboard](./docs/screenshots/admin-dashboard.png) -->
+<img width="946" height="539" alt="image" src="https://github.com/user-attachments/assets/a8f51083-393e-4739-b72d-9ef31798acbb" />
+
 <!-- ![Shift Management](./docs/screenshots/shifts.png) -->
+<img width="947" height="539" alt="image" src="https://github.com/user-attachments/assets/1a51fc38-6288-4a6b-8892-eb282bcc9ff7" />
+
 <!-- ![Face Verification Check-In](./docs/screenshots/checkin.png) -->
+<img width="943" height="539" alt="image" src="https://github.com/user-attachments/assets/68b80136-d3e8-4414-b524-e1c23706612c" />
+<img width="948" height="534" alt="image" src="https://github.com/user-attachments/assets/53490f6a-62ab-4adf-abfa-57bc0a1b4b00" />
+
 <!-- ![Client Portal](./docs/screenshots/client-portal.png) -->
+<img width="948" height="539" alt="image" src="https://github.com/user-attachments/assets/eda17541-474b-4a9a-bc3a-2ff5f8db66f9" />
+
 
 *(Screenshots: Admin dashboard, Shift scheduling, Geofenced check-in with face verification, Incident reporting, Client portal, ML staffing forecast)*
 
