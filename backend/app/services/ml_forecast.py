@@ -5,22 +5,26 @@ from datetime import datetime, timedelta
 from sqlmodel import Session, select
 from app.models.shift import Shift
 
-MODEL_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "ml", "models", "demand_model.joblib")
+MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "ml", "models")
 
-_cached_model_bundle = None
+_model_cache = {}  # organization_id -> loaded bundle
 
 
-def _load_model_bundle():
-    global _cached_model_bundle
-    if _cached_model_bundle is None:
-        if not os.path.exists(MODEL_PATH):
+def _get_model_path(organization_id: int) -> str:
+    return os.path.join(MODEL_DIR, f"demand_model_org{organization_id}.joblib")
+
+
+def is_model_available(organization_id: int) -> bool:
+    return os.path.exists(_get_model_path(organization_id))
+
+
+def _load_model_bundle(organization_id: int):
+    if organization_id not in _model_cache:
+        path = _get_model_path(organization_id)
+        if not os.path.exists(path):
             return None
-        _cached_model_bundle = joblib.load(MODEL_PATH)
-    return _cached_model_bundle
-
-
-def is_model_available() -> bool:
-    return os.path.exists(MODEL_PATH)
+        _model_cache[organization_id] = joblib.load(path)
+    return _model_cache[organization_id]
 
 
 def get_recent_rolling_avg(db: Session, site_id: int) -> float:
@@ -36,8 +40,8 @@ def get_recent_rolling_avg(db: Session, site_id: int) -> float:
     return sum(daily_totals.values()) / len(daily_totals)
 
 
-def predict_next_7_days(db: Session, site_id: int) -> list[dict]:
-    bundle = _load_model_bundle()
+def predict_next_7_days(db: Session, site_id: int, organization_id: int) -> list[dict]:
+    bundle = _load_model_bundle(organization_id)
     if bundle is None:
         return []
 
@@ -51,7 +55,6 @@ def predict_next_7_days(db: Session, site_id: int) -> list[dict]:
     for offset in range(1, 8):
         target_date = today + timedelta(days=offset)
         row = [[
-            site_id,
             target_date.weekday(),
             1 if target_date.weekday() in (5, 6) else 0,
             target_date.month,

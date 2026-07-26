@@ -3,5 +3,5 @@ __pycache__/
 *.pyc
 .env
 uploads/
-ml/models/
+!ml/models/.gitkeep
 node_modules/

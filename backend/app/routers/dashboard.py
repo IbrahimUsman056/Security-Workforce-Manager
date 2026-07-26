@@ -154,7 +154,10 @@ def ml_demand_forecast(
         if site_id not in site_ids:
             raise HTTPException(status_code=403, detail="Not authorized for this site")
 
-    if not is_model_available():
-        raise HTTPException(status_code=503, detail="Forecasting model has not been trained yet. Run train_demand_model.py first.")
+    if not is_model_available(current_user.organization_id):
+        raise HTTPException(
+            status_code=503,
+            detail="Forecasting model has not been trained yet for your organization. Not enough historical shift data may be available.",
+        )
 
-    return predict_next_7_days(db, site_id)
+    return predict_next_7_days(db, site_id, current_user.organization_id)
