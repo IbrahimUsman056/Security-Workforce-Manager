@@ -15,22 +15,22 @@ Originally built as an internship project (starting from a MERN-based background
 
 <!-- Add screenshots here, e.g.: -->
 <!-- ![Admin Dashboard](./docs/screenshots/admin-dashboard.png) -->
-<img width="646" height="439" alt="image" src="https://github.com/user-attachments/assets/a8f51083-393e-4739-b72d-9ef31798acbb" />
+<img width="946" height="539" alt="image" src="https://github.com/user-attachments/assets/a8f51083-393e-4739-b72d-9ef31798acbb" />
 
 <!-- ![Shift Management](./docs/screenshots/shifts.png) -->
-<img width="646" height="439" alt="image" src="https://github.com/user-attachments/assets/1a51fc38-6288-4a6b-8892-eb282bcc9ff7" />
+<img width="946" height="539" alt="image" src="https://github.com/user-attachments/assets/1a51fc38-6288-4a6b-8892-eb282bcc9ff7" />
 
 <!-- ![Face Verification Check-In](./docs/screenshots/checkin.png) -->
-<img width="646" height="439" alt="image" src="https://github.com/user-attachments/assets/68b80136-d3e8-4414-b524-e1c23706612c" />
+<img width="946" height="539" alt="image" src="https://github.com/user-attachments/assets/68b80136-d3e8-4414-b524-e1c23706612c" />
 
 
-<img width="646" height="439" alt="image" src="https://github.com/user-attachments/assets/8538f373-cdf9-44e9-a303-6f81426473b5" />
+<img width="946" height="539" alt="image" src="https://github.com/user-attachments/assets/8538f373-cdf9-44e9-a303-6f81426473b5" />
 
 <!-- ![Client Portal](./docs/screenshots/client-portal.png) -->
-<img width="646" height="439" alt="image" src="https://github.com/user-attachments/assets/eda17541-474b-4a9a-bc3a-2ff5f8db66f9" />
+<img width="946" height="539" alt="image" src="https://github.com/user-attachments/assets/eda17541-474b-4a9a-bc3a-2ff5f8db66f9" />
 
 
-<img width="646" height="439" alt="image" src="https://github.com/user-attachments/assets/bd4afc58-67e5-4416-85a8-de35932822cc" />
+<img width="946" height="539" alt="image" src="https://github.com/user-attachments/assets/bd4afc58-67e5-4416-85a8-de35932822cc" />
 
 *(Screenshots: Admin dashboard, Shift scheduling, Geofenced check-in with face verification, Incident reporting, Client portal, ML staffing forecast)*
 
