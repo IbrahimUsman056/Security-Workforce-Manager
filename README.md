@@ -30,7 +30,7 @@ Originally built as an internship project (starting from a MERN-based background
 <img width="946" height="539" alt="image" src="https://github.com/user-attachments/assets/eda17541-474b-4a9a-bc3a-2ff5f8db66f9" />
 
 
-<img width="946" height="539" alt="image" src="https://github.com/user-attachments/assets/bd4afc58-67e5-4416-85a8-de35932822cc" />
+<img width="946" height="539" alt="image" src="https://github.com/user-attachments/assets/ca3fb848-63be-452a-a424-c76a8d0626f7" />
 
 *(Screenshots: Admin dashboard, Shift scheduling, Geofenced check-in with face verification, Incident reporting, Client portal, ML staffing forecast)*
 
